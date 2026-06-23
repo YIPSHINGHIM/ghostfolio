@@ -3,6 +3,7 @@ import {
   CreateAccountBalanceDto,
   CreateAccountDto,
   CreateBudgetDto,
+  CreateExpenseCategoryDto,
   CreateOrderDto,
   CreateTagDto,
   CreateWatchlistItemDto,
@@ -12,6 +13,7 @@ import {
   UpdateAccountDto,
   UpdateBudgetDto,
   UpdateBulkMarketDataDto,
+  UpdateExpenseCategoryDto,
   UpdateOrderDto,
   UpdateOwnAccessTokenDto,
   UpdatePropertyDto,
@@ -199,8 +201,19 @@ export class DataService {
     return this.http.post<BudgetResponse>('/api/v1/budgets', budget);
   }
 
+  public createExpenseCategory(category: CreateExpenseCategoryDto) {
+    return this.http.post<ExpenseCategoryResponse>(
+      '/api/v1/budgets/categories',
+      category
+    );
+  }
+
   public deleteBudget(id: string) {
     return this.http.delete<void>(`/api/v1/budgets/${id}`);
+  }
+
+  public deleteExpenseCategory(id: string) {
+    return this.http.delete<void>(`/api/v1/budgets/categories/${id}`);
   }
 
   public fetchAccount(aAccountId: string) {
@@ -1002,6 +1015,19 @@ export class DataService {
 
   public updateBudget({ budget, id }: { budget: UpdateBudgetDto; id: string }) {
     return this.http.put<BudgetResponse>(`/api/v1/budgets/${id}`, budget);
+  }
+
+  public updateExpenseCategory({
+    category,
+    id
+  }: {
+    category: UpdateExpenseCategoryDto;
+    id: string;
+  }) {
+    return this.http.put<ExpenseCategoryResponse>(
+      `/api/v1/budgets/categories/${id}`,
+      category
+    );
   }
 
   public updateInfo() {
