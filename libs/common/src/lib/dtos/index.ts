@@ -7,7 +7,8 @@ import { CreateAccountDto } from './create-account.dto';
 import { CreateAssetProfileSplitDto } from './create-asset-profile-split.dto';
 import { CreateAssetProfileWithMarketDataDto } from './create-asset-profile-with-market-data.dto';
 import { CreateAssetProfileDto } from './create-asset-profile.dto';
-import { CreateBudgetDto } from './create-budget.dto';
+import { CreateBudgetDto, MANUAL_BUDGET_TYPES } from './create-budget.dto';
+import type { ManualBudgetType } from './create-budget.dto';
 import { CreateExpenseCategoryDto } from './create-expense-category.dto';
 import { CreateExpenseDto } from './create-expense.dto';
 import { CreateOrderDto } from './create-order.dto';
@@ -47,6 +48,8 @@ export {
   CreateAssetProfileSplitDto,
   CreateAssetProfileWithMarketDataDto,
   CreateBudgetDto,
+  MANUAL_BUDGET_TYPES,
+  type ManualBudgetType,
   CreateExpenseCategoryDto,
   CreateExpenseDto,
   CreateOrderDto,

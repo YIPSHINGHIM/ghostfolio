@@ -54,7 +54,9 @@ import type { AssetResponse } from './responses/asset-response.interface';
 import type { BenchmarkMarketDataDetailsResponse } from './responses/benchmark-market-data-details-response.interface';
 import type { BenchmarkResponse } from './responses/benchmark-response.interface';
 import type {
+  BudgetAccountResponse,
   BudgetResponse,
+  BudgetType,
   BudgetsResponse
 } from './responses/budget-response.interface';
 import type { CreateStripeCheckoutSessionResponse } from './responses/create-stripe-checkout-session-response.interface';
@@ -141,7 +143,9 @@ export {
   BenchmarkMarketDataDetailsResponse,
   BenchmarkProperty,
   BenchmarkResponse,
+  type BudgetAccountResponse,
   BudgetResponse,
+  type BudgetType,
   BudgetsResponse,
   Coupon,
   CreateStripeCheckoutSessionResponse,
