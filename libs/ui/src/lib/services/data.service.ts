@@ -2,6 +2,8 @@ import {
   CreateAccessDto,
   CreateAccountBalanceDto,
   CreateAccountDto,
+  CreateBudgetDto,
+  CreateExpenseCategoryDto,
   CreateOrderDto,
   CreateTagDto,
   CreateWatchlistItemDto,
@@ -9,7 +11,9 @@ import {
   TransferBalanceDto,
   UpdateAccessDto,
   UpdateAccountDto,
+  UpdateBudgetDto,
   UpdateBulkMarketDataDto,
+  UpdateExpenseCategoryDto,
   UpdateOrderDto,
   UpdateOwnAccessTokenDto,
   UpdatePropertyDto,
@@ -33,9 +37,12 @@ import {
   AssetResponse,
   BenchmarkMarketDataDetailsResponse,
   BenchmarkResponse,
+  BudgetResponse,
+  BudgetsResponse,
   CreateStripeCheckoutSessionResponse,
   DataProviderHealthResponse,
   DataProviderHistoricalResponse,
+  ExpenseCategoryResponse,
   ExportResponse,
   Filter,
   ImportResponse,
@@ -191,6 +198,25 @@ export class DataService {
         priceId
       }
     );
+  }
+
+  public createBudget(budget: CreateBudgetDto) {
+    return this.http.post<BudgetResponse>('/api/v1/budgets', budget);
+  }
+
+  public createExpenseCategory(category: CreateExpenseCategoryDto) {
+    return this.http.post<ExpenseCategoryResponse>(
+      '/api/v1/budgets/categories',
+      category
+    );
+  }
+
+  public deleteBudget(id: string) {
+    return this.http.delete<void>(`/api/v1/budgets/${id}`);
+  }
+
+  public deleteExpenseCategory(id: string) {
+    return this.http.delete<void>(`/api/v1/budgets/categories/${id}`);
   }
 
   public fetchAccount(aAccountId: string) {
@@ -381,6 +407,22 @@ export class DataService {
           return data;
         })
       );
+  }
+
+  public fetchBudgets({ month }: { month?: string } = {}) {
+    let params = new HttpParams();
+
+    if (month) {
+      params = params.append('month', month);
+    }
+
+    return this.http.get<BudgetsResponse>('/api/v1/budgets', { params });
+  }
+
+  public fetchExpenseCategories() {
+    return this.http.get<ExpenseCategoryResponse[]>(
+      '/api/v1/budgets/categories'
+    );
   }
 
   public fetchAssetProfiles({
@@ -941,6 +983,23 @@ export class DataService {
     return this.http.post<AccessTokenResponse>(
       `/api/v1/user/${aUserId}/access-token`,
       {}
+    );
+  }
+
+  public updateBudget({ budget, id }: { budget: UpdateBudgetDto; id: string }) {
+    return this.http.put<BudgetResponse>(`/api/v1/budgets/${id}`, budget);
+  }
+
+  public updateExpenseCategory({
+    category,
+    id
+  }: {
+    category: UpdateExpenseCategoryDto;
+    id: string;
+  }) {
+    return this.http.put<ExpenseCategoryResponse>(
+      `/api/v1/budgets/categories/${id}`,
+      category
     );
   }
 

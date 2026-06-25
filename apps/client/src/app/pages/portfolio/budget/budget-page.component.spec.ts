@@ -1,0 +1,222 @@
+import { DataService } from '@ghostfolio/ui/services';
+
+import { provideHttpClient } from '@angular/common/http';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { MatDialog } from '@angular/material/dialog';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { of } from 'rxjs';
+
+(global as any).$localize = (
+  messageParts: TemplateStringsArray,
+  ...expressions: any[]
+) => {
+  return String.raw({ raw: messageParts }, ...expressions);
+};
+
+jest.mock('@angular/localize', () => {
+  return {};
+});
+
+jest.mock('@ghostfolio/client/services/user/user.service', () => {
+  return {
+    UserService: class UserService {}
+  };
+});
+
+jest.mock('@ghostfolio/ui/value', () => {
+  const { Component, Input } = require('@angular/core');
+
+  @Component({
+    selector: 'gf-value',
+    template: '{{ value }}'
+  })
+  class GfValueComponent {
+    @Input() public isCurrency = false;
+    @Input() public locale: string;
+    @Input() public unit: string;
+    @Input() public value: number;
+  }
+
+  return { GfValueComponent };
+});
+
+jest.mock('@ionic/angular/standalone', () => {
+  const { Component, Input } = require('@angular/core');
+
+  @Component({
+    selector: 'ion-icon',
+    template: ''
+  })
+  class IonIcon {
+    @Input() public name: string;
+  }
+
+  return { IonIcon };
+});
+
+jest.mock('ionicons', () => {
+  return {
+    addIcons: jest.fn()
+  };
+});
+
+jest.mock('ionicons/icons', () => {
+  return {
+    createOutline: {},
+    trashOutline: {}
+  };
+});
+
+const {
+  UserService
+} = require('@ghostfolio/client/services/user/user.service');
+const { GfBudgetPageComponent } = require('./budget-page.component');
+
+describe('GfBudgetPageComponent', () => {
+  let dataService: jest.Mocked<
+    Pick<DataService, 'deleteBudget' | 'fetchBudgets'>
+  >;
+  let dialog: jest.Mocked<Pick<MatDialog, 'open'>>;
+  let fixture: ComponentFixture<GfBudgetPageComponent>;
+
+  beforeEach(async () => {
+    dataService = {
+      deleteBudget: jest.fn().mockReturnValue(of(undefined)),
+      fetchBudgets: jest.fn().mockReturnValue(
+        of({
+          budgets: [
+            {
+              account: {
+                balance: 0,
+                createdAt: new Date('2026-06-01'),
+                id: 'checking',
+                isExcluded: false,
+                name: 'Checking',
+                updatedAt: new Date('2026-06-01'),
+                userId: 'user-1'
+              },
+              accountId: 'checking',
+              amount: 500,
+              category: {
+                id: 'food',
+                name: 'Food'
+              },
+              categoryId: 'food',
+              createdAt: new Date('2026-06-01'),
+              currency: 'USD',
+              id: 'budget-1',
+              month: '2026-06',
+              name: 'Food shop',
+              remaining: 125,
+              spent: 375,
+              type: 'EXPENSE',
+              updatedAt: new Date('2026-06-01')
+            }
+          ],
+          totalBudgeted: 500,
+          totalMonthlySavings: 0,
+          totalPlannedSpend: 500,
+          totalRemaining: 125,
+          totalSpent: 375
+        })
+      )
+    };
+    dialog = {
+      open: jest.fn().mockReturnValue({
+        afterClosed: () => of({ refresh: true })
+      })
+    };
+
+    await TestBed.configureTestingModule({
+      imports: [GfBudgetPageComponent, NoopAnimationsModule],
+      providers: [
+        provideHttpClient(),
+        {
+          provide: DataService,
+          useValue: dataService
+        },
+        {
+          provide: MatDialog,
+          useValue: dialog
+        },
+        {
+          provide: UserService,
+          useValue: {
+            stateChanged: of({
+              user: {
+                permissions: [],
+                settings: {
+                  baseCurrency: 'USD',
+                  locale: 'en-US'
+                }
+              }
+            })
+          }
+        }
+      ]
+    }).compileComponents();
+
+    fixture = TestBed.createComponent(GfBudgetPageComponent);
+    fixture.autoDetectChanges();
+  });
+
+  it('loads and renders budgets for the selected month', async () => {
+    await fixture.whenStable();
+
+    expect(dataService.fetchBudgets).toHaveBeenCalledWith({
+      month: expect.stringMatching(/^\d{4}-\d{2}$/)
+    });
+    expect(fixture.nativeElement.textContent).toContain('Budget');
+    expect(fixture.nativeElement.textContent).toContain('Food shop');
+    expect(fixture.nativeElement.textContent).toContain('Food');
+    expect(fixture.nativeElement.textContent).toContain('Checking');
+    expect(
+      fixture.nativeElement.querySelector('[aria-label="Edit budget"] ion-icon')
+    ).not.toBeNull();
+    expect(
+      fixture.nativeElement.querySelector(
+        '[aria-label="Delete budget"] ion-icon'
+      )
+    ).not.toBeNull();
+    expect(fixture.nativeElement.textContent).not.toContain('editdelete');
+  });
+
+  it('reloads budgets after creating a budget', async () => {
+    await fixture.whenStable();
+
+    fixture.componentInstance.onCreateBudget();
+    await fixture.whenStable();
+
+    expect(dialog.open).toHaveBeenCalled();
+    expect(dialog.open).toHaveBeenCalledWith(expect.any(Function), {
+      data: {
+        currency: 'USD',
+        month: fixture.componentInstance.monthControl.value
+      },
+      width: '32rem'
+    });
+    expect(dataService.fetchBudgets).toHaveBeenCalledTimes(2);
+  });
+
+  it('deletes a budget and reloads the month', async () => {
+    await fixture.whenStable();
+
+    fixture.componentInstance.onDeleteBudget('budget-1');
+    await fixture.whenStable();
+
+    expect(dataService.deleteBudget).toHaveBeenCalledWith('budget-1');
+    expect(dataService.fetchBudgets).toHaveBeenCalledTimes(2);
+  });
+
+  it('opens the category management dialog', async () => {
+    await fixture.whenStable();
+
+    fixture.componentInstance.onManageCategories();
+    await fixture.whenStable();
+
+    expect(dialog.open).toHaveBeenCalledWith(expect.any(Function), {
+      maxWidth: 'calc(100vw - 2rem)',
+      width: '42rem'
+    });
+  });
+});
