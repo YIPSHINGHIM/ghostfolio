@@ -3,6 +3,7 @@ import {
   CreateAccountBalanceDto,
   CreateAccountDto,
   CreateBudgetDto,
+  CreateExpenseDto,
   CreateExpenseCategoryDto,
   CreateOrderDto,
   CreateTagDto,
@@ -12,6 +13,7 @@ import {
   UpdateAccessDto,
   UpdateAccountDto,
   UpdateBudgetDto,
+  UpdateExpenseDto,
   UpdateBulkMarketDataDto,
   UpdateExpenseCategoryDto,
   UpdateOrderDto,
@@ -43,6 +45,8 @@ import {
   DataProviderHealthResponse,
   DataProviderHistoricalResponse,
   ExpenseCategoryResponse,
+  ExpenseResponse,
+  ExpensesResponse,
   ExportResponse,
   Filter,
   ImportResponse,
@@ -206,9 +210,13 @@ export class DataService {
 
   public createExpenseCategory(category: CreateExpenseCategoryDto) {
     return this.http.post<ExpenseCategoryResponse>(
-      '/api/v1/budgets/categories',
+      '/api/v1/expense-categories',
       category
     );
+  }
+
+  public createExpense(expense: CreateExpenseDto) {
+    return this.http.post<ExpenseResponse>('/api/v1/expenses', expense);
   }
 
   public deleteBudget(id: string) {
@@ -216,7 +224,11 @@ export class DataService {
   }
 
   public deleteExpenseCategory(id: string) {
-    return this.http.delete<void>(`/api/v1/budgets/categories/${id}`);
+    return this.http.delete<void>(`/api/v1/expense-categories/${id}`);
+  }
+
+  public deleteExpense(id: string) {
+    return this.http.delete<void>(`/api/v1/expenses/${id}`);
   }
 
   public fetchAccount(aAccountId: string) {
@@ -421,8 +433,62 @@ export class DataService {
 
   public fetchExpenseCategories() {
     return this.http.get<ExpenseCategoryResponse[]>(
-      '/api/v1/budgets/categories'
+      '/api/v1/expense-categories'
     );
+  }
+
+  public fetchExpense(id: string) {
+    return this.http.get<ExpenseResponse>(`/api/v1/expenses/${id}`);
+  }
+
+  public fetchExpenses({
+    categoryId,
+    from,
+    skip,
+    sortColumn,
+    sortDirection,
+    take,
+    to
+  }: {
+    categoryId?: string;
+    from?: string;
+    skip?: number;
+    sortColumn?: string;
+    sortDirection?: SortDirection;
+    take?: number;
+    to?: string;
+  } = {}) {
+    let params = new HttpParams();
+
+    if (categoryId) {
+      params = params.append('categoryId', categoryId);
+    }
+
+    if (from) {
+      params = params.append('from', from);
+    }
+
+    if (to) {
+      params = params.append('to', to);
+    }
+
+    if (skip) {
+      params = params.append('skip', skip);
+    }
+
+    if (sortColumn) {
+      params = params.append('sortColumn', sortColumn);
+    }
+
+    if (sortDirection) {
+      params = params.append('sortDirection', sortDirection);
+    }
+
+    if (take) {
+      params = params.append('take', take);
+    }
+
+    return this.http.get<ExpensesResponse>('/api/v1/expenses', { params });
   }
 
   public fetchAssetProfiles({
@@ -998,9 +1064,19 @@ export class DataService {
     id: string;
   }) {
     return this.http.put<ExpenseCategoryResponse>(
-      `/api/v1/budgets/categories/${id}`,
+      `/api/v1/expense-categories/${id}`,
       category
     );
+  }
+
+  public updateExpense({
+    expense,
+    id
+  }: {
+    expense: UpdateExpenseDto;
+    id: string;
+  }) {
+    return this.http.put<ExpenseResponse>(`/api/v1/expenses/${id}`, expense);
   }
 
   public updateInfo() {

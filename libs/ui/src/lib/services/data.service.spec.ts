@@ -90,10 +90,37 @@ describe('DataService budget methods', () => {
     dataService.fetchExpenseCategories().subscribe();
 
     const request = httpTestingController.expectOne(
-      '/api/v1/budgets/categories'
+      '/api/v1/expense-categories'
     );
 
     expect(request.request.method).toBe('GET');
+  });
+
+  it('fetches expenses with filters', () => {
+    dataService
+      .fetchExpenses({
+        categoryId: 'category-1',
+        from: '2026-06-01',
+        skip: 25,
+        sortColumn: 'amount',
+        sortDirection: 'asc',
+        take: 25,
+        to: '2026-06-30'
+      })
+      .subscribe();
+
+    const request = httpTestingController.expectOne((req) => {
+      return req.url === '/api/v1/expenses';
+    });
+
+    expect(request.request.method).toBe('GET');
+    expect(request.request.params.get('categoryId')).toEqual('category-1');
+    expect(request.request.params.get('from')).toEqual('2026-06-01');
+    expect(request.request.params.get('skip')).toEqual('25');
+    expect(request.request.params.get('sortColumn')).toEqual('amount');
+    expect(request.request.params.get('sortDirection')).toEqual('asc');
+    expect(request.request.params.get('take')).toEqual('25');
+    expect(request.request.params.get('to')).toEqual('2026-06-30');
   });
 
   it('creates an expense category', () => {
@@ -105,7 +132,7 @@ describe('DataService budget methods', () => {
     dataService.createExpenseCategory(category).subscribe();
 
     const request = httpTestingController.expectOne(
-      '/api/v1/budgets/categories'
+      '/api/v1/expense-categories'
     );
 
     expect(request.request.method).toBe('POST');
@@ -124,7 +151,7 @@ describe('DataService budget methods', () => {
       .subscribe();
 
     const request = httpTestingController.expectOne(
-      '/api/v1/budgets/categories/category-1'
+      '/api/v1/expense-categories/category-1'
     );
 
     expect(request.request.method).toBe('PUT');
@@ -135,7 +162,7 @@ describe('DataService budget methods', () => {
     dataService.deleteExpenseCategory('category-1').subscribe();
 
     const request = httpTestingController.expectOne(
-      '/api/v1/budgets/categories/category-1'
+      '/api/v1/expense-categories/category-1'
     );
 
     expect(request.request.method).toBe('DELETE');
