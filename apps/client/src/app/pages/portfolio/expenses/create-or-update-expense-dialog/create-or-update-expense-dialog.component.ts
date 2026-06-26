@@ -3,6 +3,7 @@ import {
   ExpenseCategoryResponse,
   ExpenseResponse
 } from '@ghostfolio/common/interfaces';
+import { GfCurrencySelectorComponent } from '@ghostfolio/ui/currency-selector';
 import { DataService } from '@ghostfolio/ui/services';
 
 import { CommonModule } from '@angular/common';
@@ -31,6 +32,7 @@ interface DialogData {
 @Component({
   imports: [
     CommonModule,
+    GfCurrencySelectorComponent,
     MatButtonModule,
     MatDialogModule,
     MatFormFieldModule,
@@ -43,6 +45,7 @@ interface DialogData {
   templateUrl: './create-or-update-expense-dialog.html'
 })
 export class GfCreateOrUpdateExpenseDialogComponent {
+  public currencies: string[] = [];
   public expenseForm = new FormGroup({
     accountId: new FormControl<string>('', { nonNullable: true }),
     amount: new FormControl<number>(0, {
@@ -67,6 +70,11 @@ export class GfCreateOrUpdateExpenseDialogComponent {
     private readonly dataService: DataService,
     private readonly dialogRef: MatDialogRef<GfCreateOrUpdateExpenseDialogComponent>
   ) {
+    const { baseCurrency, currencies } = this.dataService.fetchInfo();
+
+    this.currencies = currencies;
+    this.expenseForm.controls.currency.setValue(baseCurrency);
+
     if (data.expense) {
       this.expenseForm.patchValue({
         accountId: data.expense.accountId ?? '',

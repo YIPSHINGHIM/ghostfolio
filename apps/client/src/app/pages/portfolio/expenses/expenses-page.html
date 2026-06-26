@@ -3,32 +3,64 @@
     <div class="col">
       <h1 class="d-none d-sm-block h3 mb-3 text-center" i18n>Expenses</h1>
 
-      <div class="expenses-toolbar">
-        <mat-form-field appearance="outline">
+      <div class="expenses-toolbar align-items-start d-flex flex-wrap">
+        <mat-form-field
+          appearance="outline"
+          class="expenses-filter without-hint"
+        >
           <mat-label i18n>From</mat-label>
-          <input matInput type="date" [(ngModel)]="from" />
+          <input matInput [matDatepicker]="fromDatepicker" [(ngModel)]="from" />
+          <mat-datepicker-toggle matSuffix [for]="fromDatepicker">
+            <ion-icon
+              class="text-muted"
+              matDatepickerToggleIcon
+              name="calendar-clear-outline"
+            />
+          </mat-datepicker-toggle>
+          <mat-datepicker #fromDatepicker />
         </mat-form-field>
 
-        <mat-form-field appearance="outline">
+        <mat-form-field
+          appearance="outline"
+          class="expenses-filter without-hint"
+        >
           <mat-label i18n>To</mat-label>
-          <input matInput type="date" [(ngModel)]="to" />
+          <input matInput [matDatepicker]="toDatepicker" [(ngModel)]="to" />
+          <mat-datepicker-toggle matSuffix [for]="toDatepicker">
+            <ion-icon
+              class="text-muted"
+              matDatepickerToggleIcon
+              name="calendar-clear-outline"
+            />
+          </mat-datepicker-toggle>
+          <mat-datepicker #toDatepicker />
         </mat-form-field>
 
-        <mat-form-field appearance="outline">
+        <mat-form-field
+          appearance="outline"
+          class="expenses-filter without-hint"
+        >
           <mat-label i18n>Category</mat-label>
           <mat-select [(ngModel)]="categoryId">
-            <mat-option value="" i18n>All</mat-option>
+            <mat-option i18n value="">All</mat-option>
             @for (category of categories; track category.id) {
               <mat-option [value]="category.id">{{ category.name }}</mat-option>
             }
           </mat-select>
         </mat-form-field>
 
-        <button mat-stroked-button type="button" (click)="onApplyFilters()" i18n>
+        <button
+          class="expenses-action-button"
+          i18n
+          mat-stroked-button
+          type="button"
+          (click)="onApplyFilters()"
+        >
           Apply
         </button>
 
         <button
+          class="expenses-action-button"
           color="primary"
           mat-flat-button
           type="button"
@@ -91,7 +123,11 @@
             </ng-container>
 
             <ng-container matColumnDef="actions">
-              <th *matHeaderCellDef class="expenses-actions text-right" mat-header-cell></th>
+              <th
+                *matHeaderCellDef
+                class="expenses-actions text-right"
+                mat-header-cell
+              ></th>
               <td
                 *matCellDef="let expense"
                 class="expenses-actions text-right"

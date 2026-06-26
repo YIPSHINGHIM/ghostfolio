@@ -21,7 +21,7 @@
     <mat-form-field appearance="outline">
       <mat-label i18n>Category</mat-label>
       <mat-select formControlName="categoryId">
-        <mat-option value="" i18n>None</mat-option>
+        <mat-option i18n value="">None</mat-option>
         @for (category of data.categories; track category.id) {
           <mat-option [value]="category.id">{{ category.name }}</mat-option>
         }
@@ -35,7 +35,10 @@
 
     <mat-form-field appearance="outline">
       <mat-label i18n>Currency</mat-label>
-      <input formControlName="currency" matInput />
+      <gf-currency-selector
+        formControlName="currency"
+        [currencies]="currencies"
+      />
     </mat-form-field>
 
     <mat-form-field appearance="outline">
@@ -46,14 +49,14 @@
 </mat-dialog-content>
 
 <mat-dialog-actions align="end">
-  <button mat-button type="button" (click)="onCancel()" i18n>Cancel</button>
+  <button i18n mat-button type="button" (click)="onCancel()">Cancel</button>
   <button
     color="primary"
+    i18n
     mat-flat-button
     type="button"
     [disabled]="expenseForm.invalid"
     (click)="onSubmit()"
-    i18n
   >
     Save
   </button>

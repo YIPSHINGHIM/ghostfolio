@@ -30,7 +30,9 @@ describe('GfCreateOrUpdateExpenseDialogComponent', () => {
   ];
 
   let component: GfCreateOrUpdateExpenseDialogComponent;
-  let dataService: jest.Mocked<Pick<DataService, 'createExpense' | 'updateExpense'>>;
+  let dataService: jest.Mocked<
+    Pick<DataService, 'createExpense' | 'fetchInfo' | 'updateExpense'>
+  >;
   let dialogRef: jest.Mocked<
     Pick<MatDialogRef<GfCreateOrUpdateExpenseDialogComponent>, 'close'>
   >;
@@ -41,6 +43,10 @@ describe('GfCreateOrUpdateExpenseDialogComponent', () => {
       createExpense: jest
         .fn()
         .mockReturnValue(of({ id: 'expense-1' } as ExpenseResponse)),
+      fetchInfo: jest.fn().mockReturnValue({
+        baseCurrency: 'GBP',
+        currencies: ['CHF', 'EUR', 'GBP', 'USD']
+      } as ReturnType<DataService['fetchInfo']>),
       updateExpense: jest
         .fn()
         .mockReturnValue(of({ id: 'expense-1' } as ExpenseResponse))
@@ -48,10 +54,7 @@ describe('GfCreateOrUpdateExpenseDialogComponent', () => {
     dialogRef = { close: jest.fn() };
 
     await TestBed.configureTestingModule({
-      imports: [
-        GfCreateOrUpdateExpenseDialogComponent,
-        NoopAnimationsModule
-      ],
+      imports: [GfCreateOrUpdateExpenseDialogComponent, NoopAnimationsModule],
       providers: [
         { provide: DataService, useValue: dataService },
         { provide: MatDialogRef, useValue: dialogRef },

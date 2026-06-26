@@ -6,18 +6,30 @@ import {
 import { DataService } from '@ghostfolio/ui/services';
 
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component, DestroyRef, OnInit } from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  DestroyRef,
+  OnInit
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
+import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatDialog } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { IonIcon } from '@ionic/angular/standalone';
+import { format } from 'date-fns';
 import { addIcons } from 'ionicons';
-import { addOutline, createOutline, trashOutline } from 'ionicons/icons';
+import {
+  addOutline,
+  calendarClearOutline,
+  createOutline,
+  trashOutline
+} from 'ionicons/icons';
 
 import { GfCreateOrUpdateExpenseDialogComponent } from './create-or-update-expense-dialog/create-or-update-expense-dialog.component';
 
@@ -28,6 +40,7 @@ import { GfCreateOrUpdateExpenseDialogComponent } from './create-or-update-expen
     FormsModule,
     IonIcon,
     MatButtonModule,
+    MatDatepickerModule,
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
@@ -50,10 +63,10 @@ export class GfExpensesPageComponent implements OnInit {
     'comment',
     'actions'
   ];
-  public from = '';
+  public from: Date | null = null;
   public isLoading = true;
   public totalCount = 0;
-  public to = '';
+  public to: Date | null = null;
 
   public constructor(
     private readonly changeDetectorRef: ChangeDetectorRef,
@@ -61,7 +74,12 @@ export class GfExpensesPageComponent implements OnInit {
     private readonly destroyRef: DestroyRef,
     private readonly dialog: MatDialog
   ) {
-    addIcons({ addOutline, createOutline, trashOutline });
+    addIcons({
+      addOutline,
+      calendarClearOutline,
+      createOutline,
+      trashOutline
+    });
   }
 
   public ngOnInit() {
@@ -110,8 +128,8 @@ export class GfExpensesPageComponent implements OnInit {
     this.dataService
       .fetchExpenses({
         categoryId: this.categoryId || undefined,
-        from: this.from || undefined,
-        to: this.to || undefined
+        from: this.formatFilterDate(this.from),
+        to: this.formatFilterDate(this.to)
       })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(({ count, expenses }: ExpensesResponse) => {
@@ -138,5 +156,9 @@ export class GfExpensesPageComponent implements OnInit {
           this.loadExpenses();
         }
       });
+  }
+
+  private formatFilterDate(date: Date | null) {
+    return date ? format(date, 'yyyy-MM-dd') : undefined;
   }
 }

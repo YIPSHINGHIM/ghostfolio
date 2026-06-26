@@ -5,6 +5,7 @@ import {
 import { DataService } from '@ghostfolio/ui/services';
 
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideNativeDateAdapter } from '@angular/material/core';
 import { MatDialog } from '@angular/material/dialog';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { of } from 'rxjs';
@@ -45,6 +46,7 @@ jest.mock('ionicons', () => {
 jest.mock('ionicons/icons', () => {
   return {
     addOutline: {},
+    calendarClearOutline: {},
     createOutline: {},
     trashOutline: {}
   };
@@ -77,7 +79,10 @@ describe('GfExpensesPageComponent', () => {
   };
 
   let dataService: jest.Mocked<
-    Pick<DataService, 'deleteExpense' | 'fetchExpenseCategories' | 'fetchExpenses'>
+    Pick<
+      DataService,
+      'deleteExpense' | 'fetchExpenseCategories' | 'fetchExpenses'
+    >
   >;
   let dialog: jest.Mocked<Pick<MatDialog, 'open'>>;
   let fixture: ComponentFixture<GfExpensesPageComponent>;
@@ -97,6 +102,7 @@ describe('GfExpensesPageComponent', () => {
     await TestBed.configureTestingModule({
       imports: [GfExpensesPageComponent, NoopAnimationsModule],
       providers: [
+        provideNativeDateAdapter(),
         { provide: DataService, useValue: dataService },
         { provide: MatDialog, useValue: dialog }
       ]
@@ -124,6 +130,22 @@ describe('GfExpensesPageComponent', () => {
 
     expect(dataService.deleteExpense).toHaveBeenCalledWith('expense-1');
     expect(dataService.fetchExpenses).toHaveBeenCalledTimes(2);
+  });
+
+  it('applies date filters as api date strings', async () => {
+    await fixture.whenStable();
+
+    dataService.fetchExpenses.mockClear();
+    fixture.componentInstance.from = new Date('2026-06-01T00:00:00.000Z');
+    fixture.componentInstance.to = new Date('2026-06-30T00:00:00.000Z');
+    fixture.componentInstance.onApplyFilters();
+    await fixture.whenStable();
+
+    expect(dataService.fetchExpenses).toHaveBeenCalledWith({
+      categoryId: undefined,
+      from: '2026-06-01',
+      to: '2026-06-30'
+    });
   });
 
   it('opens the expense dialog and refreshes after close', async () => {
