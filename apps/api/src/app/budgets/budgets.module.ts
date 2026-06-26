@@ -7,6 +7,7 @@ import { BudgetsService } from './budgets.service';
 
 @Module({
   controllers: [BudgetsController],
+  exports: [BudgetsService],
   imports: [PrismaModule],
   providers: [BudgetsService]
 })

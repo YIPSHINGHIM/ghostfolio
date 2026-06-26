@@ -25,6 +25,7 @@ describe('BudgetsService', () => {
       update: jest.Mock;
     };
     expense: {
+      count: jest.Mock;
       groupBy: jest.Mock;
     };
     expenseCategory: {
@@ -49,6 +50,7 @@ describe('BudgetsService', () => {
         update: jest.fn()
       },
       expense: {
+        count: jest.fn(),
         groupBy: jest.fn()
       },
       expenseCategory: {
@@ -357,6 +359,7 @@ describe('BudgetsService', () => {
       id: categoryId,
       userId
     });
+    prismaService.expense.count.mockResolvedValue(0);
     prismaService.expenseCategory.delete.mockResolvedValue({
       id: categoryId
     });
@@ -366,6 +369,27 @@ describe('BudgetsService', () => {
     expect(prismaService.expenseCategory.delete).toHaveBeenCalledWith({
       where: { id: categoryId }
     });
+  });
+
+  it('blocks deleting a category used by expenses', async () => {
+    prismaService.expenseCategory.findFirst.mockResolvedValue({
+      color: '#0055aa',
+      createdAt,
+      id: categoryId,
+      name: 'Food',
+      updatedAt,
+      userId
+    });
+    prismaService.expense.count.mockResolvedValue(1);
+
+    await expect(
+      budgetsService.deleteCategory({ id: categoryId, userId })
+    ).rejects.toThrow(ConflictException);
+
+    expect(prismaService.expense.count).toHaveBeenCalledWith({
+      where: { categoryId, userId }
+    });
+    expect(prismaService.expenseCategory.delete).not.toHaveBeenCalled();
   });
 
   it('creates a budget for a category owned by the current user', async () => {

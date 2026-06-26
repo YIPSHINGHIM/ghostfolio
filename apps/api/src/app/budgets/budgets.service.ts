@@ -108,6 +108,14 @@ export class BudgetsService {
   public async deleteCategory({ id, userId }: { id: string; userId: string }) {
     await this.validateCategoryOwnership({ categoryId: id, userId });
 
+    const expenseCount = await this.prismaService.expense.count({
+      where: { categoryId: id, userId }
+    });
+
+    if (expenseCount > 0) {
+      throw new ConflictException();
+    }
+
     return this.prismaService.expenseCategory.delete({
       where: { id }
     });
