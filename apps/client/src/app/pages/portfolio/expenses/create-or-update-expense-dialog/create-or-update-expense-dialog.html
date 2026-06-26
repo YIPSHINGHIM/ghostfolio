@@ -1,0 +1,60 @@
+<h2 mat-dialog-title>
+  @if (data.expense) {
+    <ng-container i18n>Edit expense</ng-container>
+  } @else {
+    <ng-container i18n>Create expense</ng-container>
+  }
+</h2>
+
+<mat-dialog-content>
+  <form class="expense-form" [formGroup]="expenseForm" (ngSubmit)="onSubmit()">
+    <mat-form-field appearance="outline">
+      <mat-label i18n>Date</mat-label>
+      <input formControlName="date" matInput type="date" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label i18n>Merchant</mat-label>
+      <input formControlName="merchant" matInput />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label i18n>Category</mat-label>
+      <mat-select formControlName="categoryId">
+        <mat-option value="" i18n>None</mat-option>
+        @for (category of data.categories; track category.id) {
+          <mat-option [value]="category.id">{{ category.name }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label i18n>Amount</mat-label>
+      <input formControlName="amount" matInput type="number" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label i18n>Currency</mat-label>
+      <input formControlName="currency" matInput />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label i18n>Comment</mat-label>
+      <input formControlName="comment" matInput />
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button type="button" (click)="onCancel()" i18n>Cancel</button>
+  <button
+    color="primary"
+    mat-flat-button
+    type="button"
+    [disabled]="expenseForm.invalid"
+    (click)="onSubmit()"
+    i18n
+  >
+    Save
+  </button>
+</mat-dialog-actions>

@@ -19,4 +19,12 @@ describe('internalRoutes', () => {
       title: 'Budget'
     });
   });
+
+  it('has the expenses portfolio route', () => {
+    expect(internalRoutes.portfolio.subRoutes.expenses).toEqual({
+      path: 'expenses',
+      routerLink: ['/portfolio', 'expenses'],
+      title: 'Expenses'
+    });
+  });
 });

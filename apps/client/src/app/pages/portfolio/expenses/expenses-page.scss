@@ -1,0 +1,50 @@
+.expenses-toolbar {
+  align-items: flex-start;
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(3, minmax(9rem, 1fr)) auto auto;
+  margin-bottom: 1.5rem;
+}
+
+.expenses-toolbar button {
+  min-height: 3.5rem;
+}
+
+.expenses-toolbar ion-icon {
+  margin-right: 0.375rem;
+}
+
+.expenses-table {
+  table-layout: fixed;
+}
+
+.expenses-table .mat-column-date {
+  width: 8rem;
+}
+
+.expenses-table .mat-column-amount {
+  width: 8rem;
+}
+
+.expenses-table .mat-column-currency {
+  width: 6rem;
+}
+
+.expenses-actions {
+  white-space: nowrap;
+  width: 6rem;
+}
+
+@media (max-width: 991.98px) {
+  .expenses-toolbar {
+    grid-template-columns: 1fr;
+  }
+
+  .expenses-table {
+    min-width: 56rem;
+  }
+
+  .expenses-table-wrapper {
+    overflow-x: auto;
+  }
+}
