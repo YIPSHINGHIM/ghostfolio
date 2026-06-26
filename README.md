@@ -334,6 +334,58 @@ Deprecated: `GET http://localhost:3333/api/v1/auth/anonymous/<INSERT_SECURITY_TO
 | `color` | `string` (optional) | Hex color code               |
 | `name`  | `string`            | Name of the expense category |
 
+### Expenses (experimental)
+
+#### Prerequisites
+
+[Bearer Token](#authorization-bearer-token) or `Authorization: Api-Key <INSERT_API_KEY>` for authorization
+
+#### List Expenses
+
+`GET http://localhost:3333/api/v1/expenses?from=2026-06-01&to=2026-06-30&categoryId=<INSERT_CATEGORY_ID>&skip=0&take=50`
+
+#### Create Expense
+
+`POST http://localhost:3333/api/v1/expenses`
+
+#### Body
+
+```json
+{
+  "accountId": "clx...",
+  "amount": 25,
+  "categoryId": "clx...",
+  "comment": "Lunch",
+  "currency": "USD",
+  "date": "2026-06-15",
+  "merchant": "Cafe",
+  "tagIds": ["clx..."]
+}
+```
+
+| Field        | Type                  | Description                        |
+| ------------ | --------------------- | ---------------------------------- |
+| `accountId`  | `string` (optional)   | Id of the account                  |
+| `amount`     | `number`              | Expense amount                     |
+| `categoryId` | `string` (optional)   | Id of the expense category         |
+| `comment`    | `string` (optional)   | Comment of the expense             |
+| `currency`   | `string`              | `CHF` \| `EUR` \| `USD` etc.       |
+| `date`       | `string`              | Date in the format `YYYY-MM-DD`    |
+| `merchant`   | `string` (optional)   | Merchant or payee                  |
+| `tagIds`     | `string[]` (optional) | Ids of tags                        |
+
+#### Additional Expense Endpoints
+
+| Method   | Endpoint                         | Description             |
+| -------- | -------------------------------- | ----------------------- |
+| `GET`    | `/api/v1/expenses/:id`           | Get one expense         |
+| `PUT`    | `/api/v1/expenses/:id`           | Update one expense      |
+| `DELETE` | `/api/v1/expenses/:id`           | Delete one expense      |
+| `GET`    | `/api/v1/expense-categories`     | List expense categories |
+| `POST`   | `/api/v1/expense-categories`     | Create expense category |
+| `PUT`    | `/api/v1/expense-categories/:id` | Update expense category |
+| `DELETE` | `/api/v1/expense-categories/:id` | Delete expense category |
+
 ### Portfolio (experimental)
 
 #### Prerequisites
