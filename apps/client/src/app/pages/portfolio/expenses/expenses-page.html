@@ -68,7 +68,7 @@
       </div>
 
       @if (dataSource.data.length > 0) {
-        <div class="expenses-table-wrapper">
+        <div class="expenses-table-wrapper d-none d-md-block">
           <table
             class="expenses-table gf-table w-100"
             mat-table
@@ -151,6 +151,51 @@
             <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
             <tr *matRowDef="let row; columns: displayedColumns" mat-row></tr>
           </table>
+        </div>
+
+        <div class="expenses-mobile-list d-md-none">
+          @for (expense of dataSource.data; track expense.id) {
+            <div class="expenses-mobile-item">
+              <div class="expenses-mobile-main">
+                <div class="expenses-mobile-date">
+                  {{ expense.date | date }}
+                </div>
+                <div class="expenses-mobile-merchant">
+                  {{ expense.merchant }}
+                </div>
+                <div class="expenses-mobile-meta">
+                  {{ expense.category?.name }}
+                  @if (expense.comment) {
+                    <span aria-hidden="true"> · </span>{{ expense.comment }}
+                  }
+                </div>
+              </div>
+
+              <div class="expenses-mobile-side">
+                <div class="expenses-mobile-amount">
+                  {{ formatAmount(expense) }}
+                </div>
+                <div class="expenses-mobile-actions">
+                  <button
+                    mat-icon-button
+                    type="button"
+                    [attr.aria-label]="'Edit expense'"
+                    (click)="onEditExpense(expense)"
+                  >
+                    <ion-icon aria-hidden="true" name="create-outline" />
+                  </button>
+                  <button
+                    mat-icon-button
+                    type="button"
+                    [attr.aria-label]="'Delete expense'"
+                    (click)="onDeleteExpense(expense.id)"
+                  >
+                    <ion-icon aria-hidden="true" name="trash-outline" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          }
         </div>
       } @else if (!isLoading) {
         <div class="py-5 text-center text-muted" i18n>

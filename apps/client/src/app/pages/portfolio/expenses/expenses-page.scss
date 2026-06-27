@@ -2,6 +2,7 @@
   align-items: center;
   gap: 0.75rem;
   margin-bottom: 1.5rem;
+  padding-top: 0.5rem;
 }
 
 .expenses-filter {
@@ -52,6 +53,63 @@
   width: 6rem;
 }
 
+.expenses-mobile-list {
+  border-top: 1px solid
+    rgba(
+      var(--palette-foreground-divider),
+      var(--palette-foreground-divider-alpha)
+    );
+}
+
+.expenses-mobile-item {
+  align-items: flex-start;
+  border-bottom: 1px solid
+    rgba(
+      var(--palette-foreground-divider),
+      var(--palette-foreground-divider-alpha)
+    );
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+  padding: 0.875rem 0;
+}
+
+.expenses-mobile-main {
+  min-width: 0;
+}
+
+.expenses-mobile-date,
+.expenses-mobile-meta {
+  color: rgba(
+    var(--palette-foreground-secondary-text),
+    var(--palette-foreground-secondary-text-alpha)
+  );
+  font-size: 0.8125rem;
+}
+
+.expenses-mobile-merchant {
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+
+.expenses-mobile-side {
+  align-items: flex-end;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  gap: 0.25rem;
+}
+
+.expenses-mobile-amount {
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.expenses-mobile-actions {
+  display: flex;
+  margin-right: -0.5rem;
+}
+
 @media (max-width: 991.98px) {
   .expenses-date-range-filter,
   .expenses-filter {
@@ -64,5 +122,22 @@
 
   .expenses-table-wrapper {
     overflow-x: auto;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .expenses-action-button {
+    flex: 1 1 0;
+    justify-content: center;
+  }
+
+  .expenses-date-range-filter {
+    flex-basis: 100%;
+    min-width: 0;
+  }
+
+  .expenses-filter {
+    flex-basis: 100%;
+    min-width: 0;
   }
 }
