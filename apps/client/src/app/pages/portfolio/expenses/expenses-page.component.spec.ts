@@ -9,6 +9,7 @@ import { provideNativeDateAdapter } from '@angular/material/core';
 import { MatDialog } from '@angular/material/dialog';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { provideRouter } from '@angular/router';
+import { endOfMonth, format, startOfMonth } from 'date-fns';
 import { of } from 'rxjs';
 
 import { GfExpensesPageComponent } from './expenses-page.component';
@@ -147,6 +148,20 @@ describe('GfExpensesPageComponent', () => {
       from: '2026-06-01',
       to: '2026-06-30'
     });
+  });
+
+  it('selects the current month date range', async () => {
+    await fixture.whenStable();
+
+    const today = new Date();
+    fixture.componentInstance.onSelectCurrentMonth();
+
+    expect(format(fixture.componentInstance.from, 'yyyy-MM-dd')).toEqual(
+      format(startOfMonth(today), 'yyyy-MM-dd')
+    );
+    expect(format(fixture.componentInstance.to, 'yyyy-MM-dd')).toEqual(
+      format(endOfMonth(today), 'yyyy-MM-dd')
+    );
   });
 
   it('opens the expense dialog and refreshes after close', async () => {

@@ -6,34 +6,31 @@
       <div class="expenses-toolbar d-flex flex-wrap">
         <mat-form-field
           appearance="outline"
-          class="expenses-filter without-hint"
+          class="expenses-date-range-filter without-hint"
         >
-          <mat-label i18n>From</mat-label>
-          <input matInput [matDatepicker]="fromDatepicker" [(ngModel)]="from" />
-          <mat-datepicker-toggle matSuffix [for]="fromDatepicker">
+          <mat-label i18n>Date range</mat-label>
+          <mat-date-range-input [rangePicker]="dateRangePicker">
+            <input
+              i18n-placeholder
+              matStartDate
+              placeholder="From"
+              [(ngModel)]="from"
+            />
+            <input
+              i18n-placeholder
+              matEndDate
+              placeholder="To"
+              [(ngModel)]="to"
+            />
+          </mat-date-range-input>
+          <mat-datepicker-toggle matSuffix [for]="dateRangePicker">
             <ion-icon
               class="text-muted"
               matDatepickerToggleIcon
               name="calendar-clear-outline"
             />
           </mat-datepicker-toggle>
-          <mat-datepicker #fromDatepicker />
-        </mat-form-field>
-
-        <mat-form-field
-          appearance="outline"
-          class="expenses-filter without-hint"
-        >
-          <mat-label i18n>To</mat-label>
-          <input matInput [matDatepicker]="toDatepicker" [(ngModel)]="to" />
-          <mat-datepicker-toggle matSuffix [for]="toDatepicker">
-            <ion-icon
-              class="text-muted"
-              matDatepickerToggleIcon
-              name="calendar-clear-outline"
-            />
-          </mat-datepicker-toggle>
-          <mat-datepicker #toDatepicker />
+          <mat-date-range-picker #dateRangePicker />
         </mat-form-field>
 
         <mat-form-field
@@ -48,6 +45,16 @@
             }
           </mat-select>
         </mat-form-field>
+
+        <button
+          class="expenses-action-button"
+          i18n
+          mat-stroked-button
+          type="button"
+          (click)="onSelectCurrentMonth()"
+        >
+          Current month
+        </button>
 
         <button
           class="expenses-action-button"

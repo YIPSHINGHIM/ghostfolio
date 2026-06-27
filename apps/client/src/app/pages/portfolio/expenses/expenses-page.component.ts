@@ -24,7 +24,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { IonIcon } from '@ionic/angular/standalone';
-import { format } from 'date-fns';
+import { endOfMonth, format, startOfMonth } from 'date-fns';
 import { addIcons } from 'ionicons';
 import {
   calendarClearOutline,
@@ -109,6 +109,13 @@ export class GfExpensesPageComponent implements OnInit {
 
   public onCreateExpense() {
     this.openExpenseDialog();
+  }
+
+  public onSelectCurrentMonth() {
+    const today = new Date();
+
+    this.from = startOfMonth(today);
+    this.to = endOfMonth(today);
   }
 
   public onDeleteExpense(id: string) {

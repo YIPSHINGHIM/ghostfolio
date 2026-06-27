@@ -10,6 +10,12 @@
   min-width: 11rem;
 }
 
+.expenses-date-range-filter {
+  flex: 1 1 22rem;
+  max-width: 24rem;
+  min-width: 18rem;
+}
+
 .expenses-action-button {
   align-items: center;
   display: inline-flex;
@@ -17,7 +23,7 @@
   white-space: nowrap;
 }
 
-.expenses-filter .mat-datepicker-toggle {
+.expenses-date-range-filter .mat-datepicker-toggle {
   margin-right: 0.25rem;
 }
 
@@ -47,6 +53,7 @@
 }
 
 @media (max-width: 991.98px) {
+  .expenses-date-range-filter,
   .expenses-filter {
     max-width: none;
   }
