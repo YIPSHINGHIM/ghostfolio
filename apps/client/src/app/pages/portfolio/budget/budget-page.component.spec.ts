@@ -2,9 +2,12 @@ import { DataService } from '@ghostfolio/ui/services';
 
 import { provideHttpClient } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideNativeDateAdapter } from '@angular/material/core';
 import { MatDialog } from '@angular/material/dialog';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-import { of } from 'rxjs';
+import { ActivatedRoute, Params, Router } from '@angular/router';
+import { format, startOfMonth } from 'date-fns';
+import { of, Subject } from 'rxjs';
 
 (global as any).$localize = (
   messageParts: TemplateStringsArray,
@@ -40,10 +43,25 @@ jest.mock('@ghostfolio/ui/value', () => {
   return { GfValueComponent };
 });
 
+jest.mock('@ghostfolio/ui/fab', () => {
+  const { Component, Input } = require('@angular/core');
+
+  @Component({
+    selector: 'gf-fab',
+    template: '<button class="mock-fab"></button>'
+  })
+  class GfFabComponent {
+    @Input() public queryParams: Record<string, unknown>;
+  }
+
+  return { GfFabComponent };
+});
+
 jest.mock('@ionic/angular/standalone', () => {
   const { Component, Input } = require('@angular/core');
 
   @Component({
+    // eslint-disable-next-line @angular-eslint/component-selector
     selector: 'ion-icon',
     template: ''
   })
@@ -62,6 +80,7 @@ jest.mock('ionicons', () => {
 
 jest.mock('ionicons/icons', () => {
   return {
+    calendarClearOutline: {},
     createOutline: {},
     trashOutline: {}
   };
@@ -78,8 +97,10 @@ describe('GfBudgetPageComponent', () => {
   >;
   let dialog: jest.Mocked<Pick<MatDialog, 'open'>>;
   let fixture: ComponentFixture<GfBudgetPageComponent>;
+  let queryParams: Subject<Params>;
 
   beforeEach(async () => {
+    queryParams = new Subject<Params>();
     dataService = {
       deleteBudget: jest.fn().mockReturnValue(of(undefined)),
       fetchBudgets: jest.fn().mockReturnValue(
@@ -131,6 +152,13 @@ describe('GfBudgetPageComponent', () => {
       imports: [GfBudgetPageComponent, NoopAnimationsModule],
       providers: [
         provideHttpClient(),
+        provideNativeDateAdapter(),
+        {
+          provide: ActivatedRoute,
+          useValue: {
+            queryParams: queryParams.asObservable()
+          }
+        },
         {
           provide: DataService,
           useValue: dataService
@@ -138,6 +166,12 @@ describe('GfBudgetPageComponent', () => {
         {
           provide: MatDialog,
           useValue: dialog
+        },
+        {
+          provide: Router,
+          useValue: {
+            navigate: jest.fn()
+          }
         },
         {
           provide: UserService,
@@ -191,11 +225,72 @@ describe('GfBudgetPageComponent', () => {
     expect(dialog.open).toHaveBeenCalledWith(expect.any(Function), {
       data: {
         currency: 'USD',
-        month: fixture.componentInstance.monthControl.value
+        month: format(fixture.componentInstance.monthControl.value, 'yyyy-MM')
       },
       width: '32rem'
     });
     expect(dataService.fetchBudgets).toHaveBeenCalledTimes(2);
+  });
+
+  it('uses the material month picker controls and current month action', async () => {
+    await fixture.whenStable();
+
+    dataService.fetchBudgets.mockClear();
+    fixture.componentInstance.monthControl.setValue(new Date('2026-05-18'));
+    await fixture.whenStable();
+
+    expect(dataService.fetchBudgets).toHaveBeenCalledWith({
+      month: '2026-05'
+    });
+    expect(
+      fixture.nativeElement.querySelector('mat-form-field')
+    ).not.toBeNull();
+    expect(
+      fixture.nativeElement.querySelector('[matDatepickerToggleIcon]')
+    ).not.toBeNull();
+
+    fixture.componentInstance.onSelectCurrentMonth();
+
+    expect(
+      format(fixture.componentInstance.monthControl.value, 'yyyy-MM-dd')
+    ).toEqual(format(startOfMonth(new Date()), 'yyyy-MM-dd'));
+  });
+
+  it('opens the create dialog from the createDialog query param', async () => {
+    dialog.open.mockClear();
+    queryParams.next({ createDialog: 'true' });
+    await fixture.whenStable();
+
+    expect(dialog.open).toHaveBeenCalledWith(expect.any(Function), {
+      data: {
+        currency: 'USD',
+        month: format(fixture.componentInstance.monthControl.value, 'yyyy-MM')
+      },
+      width: '32rem'
+    });
+  });
+
+  it('renders the create budget fab and mobile budget list', async () => {
+    await fixture.whenStable();
+
+    expect(fixture.nativeElement.querySelector('gf-fab')).not.toBeNull();
+    expect(
+      fixture.nativeElement.querySelector('.budget-mobile-list')
+    ).not.toBeNull();
+    expect(fixture.nativeElement.textContent).toContain('125');
+  });
+
+  it('keeps desktop icon buttons on the material icon-button layout', async () => {
+    await fixture.whenStable();
+
+    const desktopActionButtons = fixture.nativeElement.querySelectorAll(
+      '.budget-table [mat-icon-button]'
+    );
+
+    expect(desktopActionButtons).toHaveLength(2);
+    desktopActionButtons.forEach((button: HTMLButtonElement) => {
+      expect(button.classList.contains('budget-action-button')).toBe(false);
+    });
   });
 
   it('deletes a budget and reloads the month', async () => {

@@ -3,14 +3,51 @@
     <div class="col">
       <h1 class="d-none d-sm-block h3 mb-3 text-center" i18n>Budget</h1>
 
-      <div class="align-items-center d-flex flex-wrap mb-3">
-        <label class="mb-2 mr-2" for="budget-month" i18n>Month</label>
-        <input
-          class="budget-month-input form-control mb-2"
-          id="budget-month"
-          type="month"
-          [formControl]="monthControl"
-        />
+      <div class="budget-toolbar d-flex flex-wrap">
+        <mat-form-field
+          appearance="outline"
+          class="budget-month-filter without-hint"
+        >
+          <mat-label i18n>Month</mat-label>
+          <input
+            matInput
+            readonly
+            [formControl]="monthControl"
+            [matDatepicker]="monthPicker"
+          />
+          <mat-datepicker-toggle matSuffix [for]="monthPicker">
+            <ion-icon
+              class="text-muted"
+              matDatepickerToggleIcon
+              name="calendar-clear-outline"
+            />
+          </mat-datepicker-toggle>
+          <mat-datepicker
+            #monthPicker
+            startView="multi-year"
+            (monthSelected)="onMonthSelected($event, monthPicker)"
+          />
+        </mat-form-field>
+
+        <button
+          class="budget-action-button"
+          i18n
+          mat-stroked-button
+          type="button"
+          (click)="onSelectCurrentMonth()"
+        >
+          Current month
+        </button>
+
+        <button
+          class="budget-action-button"
+          i18n
+          mat-stroked-button
+          type="button"
+          (click)="onManageCategories()"
+        >
+          Manage categories
+        </button>
       </div>
 
       <div class="budget-summary mb-3">
@@ -44,7 +81,7 @@
       </div>
 
       @if (dataSource.data.length > 0) {
-        <div class="budget-table-wrapper">
+        <div class="budget-table-wrapper d-none d-md-block">
           <table
             class="budget-table gf-table w-100"
             mat-table
@@ -134,7 +171,6 @@
               <th *matHeaderCellDef class="text-right" mat-header-cell></th>
               <td *matCellDef="let budget" class="text-right" mat-cell>
                 <button
-                  class="budget-action-button"
                   mat-icon-button
                   type="button"
                   [attr.aria-label]="'Edit budget'"
@@ -143,7 +179,6 @@
                   <ion-icon aria-hidden="true" name="create-outline" />
                 </button>
                 <button
-                  class="budget-action-button"
                   mat-icon-button
                   type="button"
                   [attr.aria-label]="'Delete budget'"
@@ -158,32 +193,84 @@
             <tr *matRowDef="let row; columns: displayedColumns" mat-row></tr>
           </table>
         </div>
+
+        <div class="budget-mobile-list d-md-none">
+          @for (budget of dataSource.data; track budget.id) {
+            <div class="budget-mobile-item">
+              <div class="budget-mobile-main">
+                <div class="budget-mobile-name">
+                  {{ budget.name }}
+                </div>
+                <div class="budget-mobile-meta">
+                  {{ budget.category?.name ?? budget.categoryId }}
+                  <span aria-hidden="true"> · </span>
+                  {{ budget.account?.name ?? '-' }}
+                  <span aria-hidden="true"> · </span>
+                  {{ getBudgetTypeLabel(budget.type) }}
+                </div>
+                <mat-progress-bar
+                  mode="determinate"
+                  [value]="getProgress(budget)"
+                />
+              </div>
+
+              <div class="budget-mobile-side">
+                <div class="budget-mobile-value">
+                  <span class="text-muted" i18n>Budget</span>
+                  <gf-value
+                    [isCurrency]="true"
+                    [locale]="user?.settings?.locale"
+                    [unit]="user?.settings?.baseCurrency"
+                    [value]="budget.amount"
+                  />
+                </div>
+                <div class="budget-mobile-value">
+                  <span class="text-muted" i18n>Spent</span>
+                  <gf-value
+                    [isCurrency]="true"
+                    [locale]="user?.settings?.locale"
+                    [unit]="user?.settings?.baseCurrency"
+                    [value]="budget.spent"
+                  />
+                </div>
+                <div class="budget-mobile-value">
+                  <span class="text-muted" i18n>Remaining</span>
+                  <gf-value
+                    [isCurrency]="true"
+                    [locale]="user?.settings?.locale"
+                    [unit]="user?.settings?.baseCurrency"
+                    [value]="budget.remaining"
+                  />
+                </div>
+                <div class="budget-mobile-actions">
+                  <button
+                    mat-icon-button
+                    type="button"
+                    [attr.aria-label]="'Edit budget'"
+                    (click)="onUpdateBudget(budget)"
+                  >
+                    <ion-icon aria-hidden="true" name="create-outline" />
+                  </button>
+                  <button
+                    mat-icon-button
+                    type="button"
+                    [attr.aria-label]="'Delete budget'"
+                    (click)="onDeleteBudget(budget.id)"
+                  >
+                    <ion-icon aria-hidden="true" name="trash-outline" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
       } @else if (!isLoading) {
         <div class="py-5 text-center text-muted" i18n>
           No budgets have been created for this month.
         </div>
       }
-
-      <div class="budget-actions mt-3">
-        <button
-          color="primary"
-          i18n
-          mat-flat-button
-          type="button"
-          (click)="onCreateBudget()"
-        >
-          Create budget
-        </button>
-
-        <button
-          i18n
-          mat-stroked-button
-          type="button"
-          (click)="onManageCategories()"
-        >
-          Manage categories
-        </button>
-      </div>
     </div>
   </div>
+
+  <gf-fab [queryParams]="{ createDialog: true }" />
 </div>

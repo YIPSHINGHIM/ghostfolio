@@ -78,7 +78,7 @@ export class GfCreateOrUpdateBudgetDialogComponent implements OnInit {
     )
   });
   public accounts: AccountWithValue[] = [];
-  public budgetTypes: Array<{ label: string; value: ManualBudgetType }> = [
+  public budgetTypes: { label: string; value: ManualBudgetType }[] = [
     { label: $localize`Expense`, value: 'EXPENSE' },
     { label: $localize`Cash savings`, value: 'CASH_SAVINGS' },
     { label: $localize`Investment savings`, value: 'INVESTMENT_SAVINGS' }

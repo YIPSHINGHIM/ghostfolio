@@ -11,6 +11,7 @@ jest.mock('@ionic/angular/standalone', () => {
   const { Component, Input } = require('@angular/core');
 
   @Component({
+    // eslint-disable-next-line @angular-eslint/component-selector
     selector: 'ion-icon',
     template: ''
   })
