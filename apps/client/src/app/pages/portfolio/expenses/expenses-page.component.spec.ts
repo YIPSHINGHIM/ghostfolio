@@ -8,6 +8,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideNativeDateAdapter } from '@angular/material/core';
 import { MatDialog } from '@angular/material/dialog';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { provideRouter } from '@angular/router';
 import { of } from 'rxjs';
 
 import { GfExpensesPageComponent } from './expenses-page.component';
@@ -45,7 +46,6 @@ jest.mock('ionicons', () => {
 
 jest.mock('ionicons/icons', () => {
   return {
-    addOutline: {},
     calendarClearOutline: {},
     createOutline: {},
     trashOutline: {}
@@ -103,6 +103,7 @@ describe('GfExpensesPageComponent', () => {
       imports: [GfExpensesPageComponent, NoopAnimationsModule],
       providers: [
         provideNativeDateAdapter(),
+        provideRouter([]),
         { provide: DataService, useValue: dataService },
         { provide: MatDialog, useValue: dialog }
       ]

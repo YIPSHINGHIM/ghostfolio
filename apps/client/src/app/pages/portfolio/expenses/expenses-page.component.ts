@@ -3,6 +3,7 @@ import {
   ExpenseResponse,
   ExpensesResponse
 } from '@ghostfolio/common/interfaces';
+import { GfFabComponent } from '@ghostfolio/ui/fab';
 import { DataService } from '@ghostfolio/ui/services';
 
 import { CommonModule } from '@angular/common';
@@ -21,11 +22,11 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { IonIcon } from '@ionic/angular/standalone';
 import { format } from 'date-fns';
 import { addIcons } from 'ionicons';
 import {
-  addOutline,
   calendarClearOutline,
   createOutline,
   trashOutline
@@ -38,13 +39,15 @@ import { GfCreateOrUpdateExpenseDialogComponent } from './create-or-update-expen
   imports: [
     CommonModule,
     FormsModule,
+    GfFabComponent,
     IonIcon,
     MatButtonModule,
     MatDatepickerModule,
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
-    MatTableModule
+    MatTableModule,
+    RouterModule
   ],
   selector: 'gf-expenses-page',
   styleUrls: ['./expenses-page.scss'],
@@ -72,14 +75,23 @@ export class GfExpensesPageComponent implements OnInit {
     private readonly changeDetectorRef: ChangeDetectorRef,
     private readonly dataService: DataService,
     private readonly destroyRef: DestroyRef,
-    private readonly dialog: MatDialog
+    private readonly dialog: MatDialog,
+    private readonly route: ActivatedRoute,
+    private readonly router: Router
   ) {
     addIcons({
-      addOutline,
       calendarClearOutline,
       createOutline,
       trashOutline
     });
+
+    this.route.queryParams
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((params) => {
+        if (params['createDialog']) {
+          this.openExpenseDialog();
+        }
+      });
   }
 
   public ngOnInit() {
@@ -155,6 +167,8 @@ export class GfExpensesPageComponent implements OnInit {
         if (result?.refresh) {
           this.loadExpenses();
         }
+
+        this.router.navigate(['.'], { relativeTo: this.route });
       });
   }
 

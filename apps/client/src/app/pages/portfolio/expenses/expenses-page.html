@@ -58,17 +58,6 @@
         >
           Apply
         </button>
-
-        <button
-          class="expenses-action-button"
-          color="primary"
-          mat-flat-button
-          type="button"
-          (click)="onCreateExpense()"
-        >
-          <ion-icon aria-hidden="true" name="add-outline" />
-          <span i18n>Create expense</span>
-        </button>
       </div>
 
       @if (dataSource.data.length > 0) {
@@ -163,4 +152,6 @@
       }
     </div>
   </div>
+
+  <gf-fab [queryParams]="{ createDialog: true }" />
 </div>
