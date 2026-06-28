@@ -1,5 +1,6 @@
 import { UserService } from '@ghostfolio/client/services/user/user.service';
 import type { BudgetResponse, User } from '@ghostfolio/common/interfaces';
+import { GfFabComponent } from '@ghostfolio/ui/fab';
 import { DataService } from '@ghostfolio/ui/services';
 import { GfValueComponent } from '@ghostfolio/ui/value';
 
@@ -13,13 +14,24 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
+import {
+  MatDatepicker,
+  MatDatepickerModule
+} from '@angular/material/datepicker';
 import { MatDialog } from '@angular/material/dialog';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
+import { ActivatedRoute, Router } from '@angular/router';
 import { IonIcon } from '@ionic/angular/standalone';
-import { format } from 'date-fns';
+import { format, startOfMonth } from 'date-fns';
 import { addIcons } from 'ionicons';
-import { createOutline, trashOutline } from 'ionicons/icons';
+import {
+  calendarClearOutline,
+  createOutline,
+  trashOutline
+} from 'ionicons/icons';
 
 import { GfCreateOrUpdateBudgetDialogComponent } from './create-or-update-budget-dialog/create-or-update-budget-dialog.component';
 import { GfManageBudgetCategoriesDialogComponent } from './manage-budget-categories-dialog/manage-budget-categories-dialog.component';
@@ -28,9 +40,13 @@ import { GfManageBudgetCategoriesDialogComponent } from './manage-budget-categor
   host: { class: 'page' },
   imports: [
     CommonModule,
+    GfFabComponent,
     GfValueComponent,
     IonIcon,
     MatButtonModule,
+    MatDatepickerModule,
+    MatFormFieldModule,
+    MatInputModule,
     MatProgressBarModule,
     MatTableModule,
     ReactiveFormsModule
@@ -53,7 +69,7 @@ export class GfBudgetPageComponent implements OnInit {
     'actions'
   ];
   public isLoading = true;
-  public monthControl = new FormControl(format(new Date(), 'yyyy-MM'), {
+  public monthControl = new FormControl(startOfMonth(new Date()), {
     nonNullable: true
   });
   public totalBudgeted = 0;
@@ -68,9 +84,19 @@ export class GfBudgetPageComponent implements OnInit {
     private dataService: DataService,
     private destroyRef: DestroyRef,
     private dialog: MatDialog,
+    private route: ActivatedRoute,
+    private router: Router,
     private userService: UserService
   ) {
-    addIcons({ createOutline, trashOutline });
+    addIcons({ calendarClearOutline, createOutline, trashOutline });
+
+    this.route.queryParams
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((params) => {
+        if (params['createDialog']) {
+          this.onCreateBudget();
+        }
+      });
   }
 
   public ngOnInit() {
@@ -96,7 +122,7 @@ export class GfBudgetPageComponent implements OnInit {
     this.isLoading = true;
 
     this.dataService
-      .fetchBudgets({ month: this.monthControl.value })
+      .fetchBudgets({ month: this.getSelectedMonth() })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(
         ({
@@ -145,7 +171,7 @@ export class GfBudgetPageComponent implements OnInit {
   public onCreateBudget() {
     this.openBudgetDialog({
       currency: this.getCurrency(),
-      month: this.monthControl.value
+      month: this.getSelectedMonth()
     });
   }
 
@@ -169,16 +195,29 @@ export class GfBudgetPageComponent implements OnInit {
       .subscribe();
   }
 
+  public onMonthSelected(month: Date, datepicker: MatDatepicker<Date>) {
+    this.monthControl.setValue(startOfMonth(month));
+    datepicker.close();
+  }
+
+  public onSelectCurrentMonth() {
+    this.monthControl.setValue(startOfMonth(new Date()));
+  }
+
   public onUpdateBudget(budget: BudgetResponse) {
     this.openBudgetDialog({
       budget,
       currency: this.getCurrency(budget.currency),
-      month: this.monthControl.value
+      month: this.getSelectedMonth()
     });
   }
 
   private getCurrency(fallback = 'USD') {
     return this.user?.settings?.baseCurrency ?? fallback;
+  }
+
+  private getSelectedMonth() {
+    return format(this.monthControl.value, 'yyyy-MM');
   }
 
   private openBudgetDialog(data: {
@@ -197,6 +236,8 @@ export class GfBudgetPageComponent implements OnInit {
         if (result?.refresh) {
           this.fetchBudgets();
         }
+
+        this.router.navigate(['.'], { relativeTo: this.route });
       });
   }
 }

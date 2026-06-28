@@ -25,6 +25,11 @@ export const routes: Routes = [
           import('./budget/budget-page.routes').then((m) => m.routes)
       },
       {
+        path: internalRoutes.portfolio.subRoutes.expenses.path,
+        loadChildren: () =>
+          import('./expenses/expenses-page.routes').then((m) => m.routes)
+      },
+      {
         path: internalRoutes.portfolio.subRoutes.allocations.path,
         loadChildren: () =>
           import('./allocations/allocations-page.routes').then((m) => m.routes)

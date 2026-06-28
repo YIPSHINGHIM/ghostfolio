@@ -18,6 +18,7 @@ import {
   analyticsOutline,
   calculatorOutline,
   pieChartOutline,
+  receiptOutline,
   scanOutline,
   swapVerticalOutline,
   walletOutline
@@ -62,6 +63,12 @@ export class PortfolioPageComponent {
               routerLink: internalRoutes.portfolio.subRoutes.budget.routerLink
             },
             {
+              iconName: 'receipt-outline',
+              label: internalRoutes.portfolio.subRoutes.expenses.title,
+              routerLink:
+                internalRoutes.portfolio.subRoutes.expenses.routerLink
+            },
+            {
               iconName: 'pie-chart-outline',
               label: internalRoutes.portfolio.subRoutes.allocations.title,
               routerLink:
@@ -88,6 +95,7 @@ export class PortfolioPageComponent {
       analyticsOutline,
       calculatorOutline,
       pieChartOutline,
+      receiptOutline,
       scanOutline,
       swapVerticalOutline,
       walletOutline

@@ -1,0 +1,209 @@
+<div class="container">
+  <div class="row">
+    <div class="col">
+      <h1 class="d-none d-sm-block h3 mb-3 text-center" i18n>Expenses</h1>
+
+      <div class="expenses-toolbar d-flex flex-wrap">
+        <mat-form-field
+          appearance="outline"
+          class="expenses-date-range-filter without-hint"
+        >
+          <mat-label i18n>Date range</mat-label>
+          <mat-date-range-input [rangePicker]="dateRangePicker">
+            <input
+              i18n-placeholder
+              matStartDate
+              placeholder="From"
+              [(ngModel)]="from"
+            />
+            <input
+              i18n-placeholder
+              matEndDate
+              placeholder="To"
+              [(ngModel)]="to"
+            />
+          </mat-date-range-input>
+          <mat-datepicker-toggle matSuffix [for]="dateRangePicker">
+            <ion-icon
+              class="text-muted"
+              matDatepickerToggleIcon
+              name="calendar-clear-outline"
+            />
+          </mat-datepicker-toggle>
+          <mat-date-range-picker #dateRangePicker />
+        </mat-form-field>
+
+        <mat-form-field
+          appearance="outline"
+          class="expenses-filter without-hint"
+        >
+          <mat-label i18n>Category</mat-label>
+          <mat-select [(ngModel)]="categoryId">
+            <mat-option i18n value="">All</mat-option>
+            @for (category of categories; track category.id) {
+              <mat-option [value]="category.id">{{ category.name }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <button
+          class="expenses-action-button"
+          i18n
+          mat-stroked-button
+          type="button"
+          (click)="onSelectCurrentMonth()"
+        >
+          Current month
+        </button>
+
+        <button
+          class="expenses-action-button"
+          i18n
+          mat-stroked-button
+          type="button"
+          (click)="onApplyFilters()"
+        >
+          Apply
+        </button>
+      </div>
+
+      @if (dataSource.data.length > 0) {
+        <div class="expenses-table-wrapper d-none d-md-block">
+          <table
+            class="expenses-table gf-table w-100"
+            mat-table
+            [dataSource]="dataSource"
+          >
+            <ng-container matColumnDef="date">
+              <th *matHeaderCellDef i18n mat-header-cell>Date</th>
+              <td *matCellDef="let expense" mat-cell>
+                {{ expense.date | date }}
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="merchant">
+              <th *matHeaderCellDef i18n mat-header-cell>Merchant</th>
+              <td *matCellDef="let expense" mat-cell>
+                {{ expense.merchant }}
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="category">
+              <th *matHeaderCellDef i18n mat-header-cell>Category</th>
+              <td *matCellDef="let expense" mat-cell>
+                {{ expense.category?.name }}
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="amount">
+              <th *matHeaderCellDef class="text-right" i18n mat-header-cell>
+                Amount
+              </th>
+              <td *matCellDef="let expense" class="text-right" mat-cell>
+                {{ formatAmount(expense) }}
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="currency">
+              <th *matHeaderCellDef i18n mat-header-cell>Currency</th>
+              <td *matCellDef="let expense" mat-cell>
+                {{ expense.currency }}
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="comment">
+              <th *matHeaderCellDef i18n mat-header-cell>Comment</th>
+              <td *matCellDef="let expense" mat-cell>
+                {{ expense.comment }}
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="actions">
+              <th
+                *matHeaderCellDef
+                class="expenses-actions text-right"
+                mat-header-cell
+              ></th>
+              <td
+                *matCellDef="let expense"
+                class="expenses-actions text-right"
+                mat-cell
+              >
+                <button
+                  mat-icon-button
+                  type="button"
+                  [attr.aria-label]="'Edit expense'"
+                  (click)="onEditExpense(expense)"
+                >
+                  <ion-icon aria-hidden="true" name="create-outline" />
+                </button>
+                <button
+                  mat-icon-button
+                  type="button"
+                  [attr.aria-label]="'Delete expense'"
+                  (click)="onDeleteExpense(expense.id)"
+                >
+                  <ion-icon aria-hidden="true" name="trash-outline" />
+                </button>
+              </td>
+            </ng-container>
+
+            <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
+            <tr *matRowDef="let row; columns: displayedColumns" mat-row></tr>
+          </table>
+        </div>
+
+        <div class="expenses-mobile-list d-md-none">
+          @for (expense of dataSource.data; track expense.id) {
+            <div class="expenses-mobile-item">
+              <div class="expenses-mobile-main">
+                <div class="expenses-mobile-date">
+                  {{ expense.date | date }}
+                </div>
+                <div class="expenses-mobile-merchant">
+                  {{ expense.merchant }}
+                </div>
+                <div class="expenses-mobile-meta">
+                  {{ expense.category?.name }}
+                  @if (expense.comment) {
+                    <span aria-hidden="true"> · </span>{{ expense.comment }}
+                  }
+                </div>
+              </div>
+
+              <div class="expenses-mobile-side">
+                <div class="expenses-mobile-amount">
+                  {{ formatAmount(expense) }}
+                </div>
+                <div class="expenses-mobile-actions">
+                  <button
+                    mat-icon-button
+                    type="button"
+                    [attr.aria-label]="'Edit expense'"
+                    (click)="onEditExpense(expense)"
+                  >
+                    <ion-icon aria-hidden="true" name="create-outline" />
+                  </button>
+                  <button
+                    mat-icon-button
+                    type="button"
+                    [attr.aria-label]="'Delete expense'"
+                    (click)="onDeleteExpense(expense.id)"
+                  >
+                    <ion-icon aria-hidden="true" name="trash-outline" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      } @else if (!isLoading) {
+        <div class="py-5 text-center text-muted" i18n>
+          No expenses have been created.
+        </div>
+      }
+    </div>
+  </div>
+
+  <gf-fab [queryParams]="{ createDialog: true }" />
+</div>

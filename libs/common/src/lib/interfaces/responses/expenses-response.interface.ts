@@ -1,9 +1,12 @@
 import { Account, Tag } from '@prisma/client';
 
+import { ExpenseCategoryResponse } from './expense-category-response.interface';
+
 export interface ExpenseResponse {
   account?: Account;
   accountId?: string;
   amount: number;
+  category?: ExpenseCategoryResponse;
   categoryId?: string;
   comment?: string;
   createdAt: Date;

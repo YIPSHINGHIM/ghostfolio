@@ -58,6 +58,7 @@ import { SitemapModule } from './endpoints/sitemap/sitemap.module';
 import { TagsModule } from './endpoints/tags/tags.module';
 import { WatchlistModule } from './endpoints/watchlist/watchlist.module';
 import { ExchangeRateModule } from './exchange-rate/exchange-rate.module';
+import { ExpensesModule } from './expenses/expenses.module';
 import { ExportModule } from './export/export.module';
 import { HealthModule } from './health/health.module';
 import { ImportModule } from './import/import.module';
@@ -124,6 +125,7 @@ import { UserModule } from './user/user.module';
     EventsModule,
     ExchangeRateModule,
     ExchangeRateDataModule,
+    ExpensesModule,
     ExportModule,
     GhostfolioModule,
     HealthModule,
