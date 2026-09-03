@@ -145,7 +145,7 @@ export class GfCreateOrUpdateBudgetDialogComponent implements OnInit {
     this.dataService
       .updateBudget({
         budget,
-        id: this.data.budget.id
+        id: budget.id
       })
       .subscribe(() => {
         this.dialogRef.close({ refresh: true });
